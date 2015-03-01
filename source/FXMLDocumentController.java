@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,8 +41,8 @@ public class FXMLDocumentController implements Initializable {
             return yuvImage;
         }
 
-        public RandomReadYUVFile getYUVInput() {
-            return yuvInput;
+        public Optional<RandomReadYUVFile> getYUVInput() {
+            return Optional.ofNullable(yuvInput);
         }
 
         public void setCurrentFrameIndex(int index) {
@@ -55,17 +56,22 @@ public class FXMLDocumentController implements Initializable {
         }
 
         public long getCurrentFrameIndex() {
-            if (yuvInput != null) {
-                return yuvInput.getCurrentFrameIndex();
-            }
-            return -1;
+            // if (yuvInput != null) {
+                // return yuvInput.getCurrentFrameIndex();
+            // }
+            //return -1;
+            return getYUVInput().map(RandomReadYUVFile::getCurrentFrameIndex)
+                                .orElse(-1L);
+            
         }
 
         public long getTotalFrameNumbers() {
-            if (yuvInput != null) {
-                return yuvInput.getTotalFrameNumbers();
-            }
-            return -1;
+            // if (yuvInput != null) {
+                // return yuvInput.getTotalFrameNumbers();
+            // }
+            // return -1;
+            return getYUVInput().map(RandomReadYUVFile::getTotalFrameNumbers)
+                                .orElse(-1L);
         }
 
         // change yuvImage Resolution but don't change yuvImage colorspace
@@ -75,32 +81,53 @@ public class FXMLDocumentController implements Initializable {
         }
 
         public void setColorSpace(YUVImage yuvImage) {
+            // this.yuvImage = yuvImage;
+            // if (yuvInput != null) {
+                // yuvInput.setYUVImage(yuvImage);
+                // setCurrentFrameIndex(0); // need reset to file start position
+            // }
             this.yuvImage = yuvImage;
-            if (yuvInput != null) {
-                yuvInput.setYUVImage(yuvImage);
-                setCurrentFrameIndex(0); // need reset to file start position
-            }
+            getYUVInput().ifPresent(yuvInput -> {
+                                      yuvInput.setYUVImage(yuvImage);
+                                      setCurrentFrameIndex(0);
+                                    });
+
         }
 
         public void setYUVInput(File file, YUVImage yuvImage) {
-            try {
-                closeYUVFile(); // must close the file, before open a new file.
-                if (file != null) {
-                    yuvInput = new RandomReadYUVFile(file, yuvImage);
-                }
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            // try {
+                // closeYUVFile(); // must close the file, before open a new file.
+                // if (file != null) {
+                    // yuvInput = new RandomReadYUVFile(file, yuvImage);
+                // }
+            // } catch (FileNotFoundException e) {
+                // throw new RuntimeException(e);
+            // }
+            closeYUVFile(); // must close the file, before open a new file.
+            Optional.ofNullable(file).ifPresent(theFile -> { 
+                                                   try {
+                                                      yuvInput = new RandomReadYUVFile(theFile, yuvImage);
+                                                   } catch (FileNotFoundException e) { 
+                                                      throw new RuntimeException(e);
+                                                   }
+                                                });
         }
 
         public void readYUV(byte[] yuvFrame) {
-            try {
-                if (yuvInput != null) {
-                    yuvInput.read(yuvFrame);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            // try {
+                // if (yuvInput != null) {
+                    // yuvInput.read(yuvFrame);
+                // }
+            // } catch (IOException e) {
+                // throw new RuntimeException(e);
+            // }
+            getYUVInput().ifPresent(yuvInput -> {
+                                      try {
+                                        yuvInput.read(yuvFrame);
+                                      } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                      }
+                                    });
         }
 
         public int[] readYUVtoARGB() {
@@ -110,13 +137,13 @@ public class FXMLDocumentController implements Initializable {
         }
 
         public void closeYUVFile() {
-            if (yuvInput != null) {
-                try {
-                    yuvInput.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            getYUVInput().ifPresent(yuvInput -> {
+                                        try {
+                                          yuvInput.close();
+                                        } catch (IOException e) {
+                                          throw new RuntimeException(e);
+                                        }
+                                    });
         }
     }
 

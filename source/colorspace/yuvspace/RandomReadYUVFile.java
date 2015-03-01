@@ -22,9 +22,9 @@ public class RandomReadYUVFile implements Closeable {
     this.yuvImage = yuvImage;
   }
   
-  public int getTotalFrameNumbers() {
-    int oneFrameSize = yuvImage.getOneFrameSize();
-    int totalFrameNumber = (int) (yuvFile.length() / oneFrameSize); 
+  public long getTotalFrameNumbers() {
+    long oneFrameSize = yuvImage.getOneFrameSize();
+    long totalFrameNumber = yuvFile.length() / oneFrameSize; 
     return totalFrameNumber;
   }
 
