@@ -1,20 +1,16 @@
 package colorspace.yuvspace;
 
-public class YUV422 implements YUVImage {
-
-  protected int width;
-  protected int height;
-  protected int oneFrameSize;
-  protected int uIndex;
-  protected int vIndex;
+public class YUV422 extends AbstractYuvImage {
 
   public YUV422(int width, int height) {
-    setUpYUV422Image(width, height);
+    super(width, height);    
   }
   
-  protected void setUpYUV422Image(int width, int height) {
-    this.width = width;
-    this.height = height;
+  @Override
+  protected void setUpYuvImage(int width, int height){
+    int uIndex;
+    int vIndex;
+    int oneFrameSize;
     int uvRowBytes;
     int uvSize;
     if(width % 2 != 0) {
@@ -27,27 +23,13 @@ public class YUV422 implements YUVImage {
     oneFrameSize = width * height + uvSize * 2;
     uIndex = width * height;
     vIndex = uIndex + uvSize;
+    
+    this.setUIndex(uIndex);
+    this.setVIndex(vIndex);
+    this.setOneFrameSize(oneFrameSize);
   }
   
-  public int getWidth() {
-    return width;
-  }
-  public int getHeight() {
-    return height;
-  }
-  public int getOneFrameSize() {
-    return oneFrameSize;
-  }
-  public int getUIndex() { 
-    return uIndex;
-  }
-  public int getVIndex() {
-    return vIndex;
-  }
-  public void setSize(int width, int height) {
-    setUpYUV422Image(width, height);
-  }
-  
+  @Override
   public int[] convertYUVtoRGB(byte[] yuv) {
 
     
@@ -80,6 +62,7 @@ public class YUV422 implements YUVImage {
     return rgb;
   }
   
+  @Override
   public byte[] convertRGBtoYUV(int[] rgb) {
     byte[] yuvFrame = new byte[oneFrameSize];
 

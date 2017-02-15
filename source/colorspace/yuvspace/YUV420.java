@@ -1,22 +1,15 @@
 package colorspace.yuvspace;
 
-public class YUV420 implements YUVImage {
-  protected int width;
-  protected int height;
-  protected int oneFrameSize;
-  protected int uIndex;
-  protected int vIndex;
-
+public class YUV420 extends AbstractYuvImage {
   public YUV420(int width, int height) {
-    setUpYUV420Image(width, height);    
+    super(width, height);    
   }
-  /* When change the image size, not only change the size (width and height)
-   * but also change oneFrameSize, uIndex, and vIndex.
-   * So use the setUpYUV420Image() to set them.
-  */
-  private void setUpYUV420Image(int width, int height) {
-    this.width = width;
-    this.height = height;
+  
+  @Override
+  protected void setUpYuvImage(int width, int height){
+    int uIndex;
+    int vIndex;
+    int oneFrameSize;
     int uvRowBytes;
     int halfHeight;
     int uvSize;
@@ -34,30 +27,12 @@ public class YUV420 implements YUVImage {
     oneFrameSize = width * height + uvSize * 2;
     uIndex = width * height;
     vIndex = uIndex + uvSize;
+    
+    this.setUIndex(uIndex);
+    this.setVIndex(vIndex);
+    this.setOneFrameSize(oneFrameSize);
   }
-  @Override
-  public int getWidth() {
-    return width;
-  }
-  @Override
-  public int getHeight() {
-    return height;
-  }
-  @Override
-  public int getOneFrameSize() {
-    return oneFrameSize;
-  }
-  public int getUIndex() { 
-    return uIndex;
-  }
-  public int getVIndex() {
-    return vIndex;
-  }
-  @Override
-  public void setSize(int width, int height) {
-    setUpYUV420Image(width, height);
-  }
-
+  
   @Override
   public int[] convertYUVtoRGB(byte[] yuv) {
     

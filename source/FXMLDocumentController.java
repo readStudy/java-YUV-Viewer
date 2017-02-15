@@ -1,5 +1,3 @@
-
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,7 +24,7 @@ import colorspace.yuvspace.*;
 
 
 public class FXMLDocumentController implements Initializable {
-
+  
     static final class YUVFileHandle {
 
         private YUVImage yuvImage;
